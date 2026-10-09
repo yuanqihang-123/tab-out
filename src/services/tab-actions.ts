@@ -235,13 +235,15 @@ export class TabActions {
   /**
    * Keeps the dashboard pinned to the rightmost tab of its window, so any
    * newly opened page lands to its left.
+   * Pass a target id to position only the newly opened dashboard.
    *
    * @returns `true` when the dashboard was moved, `false` when there was
    * nothing to do — no dashboard tab is open, or it was already last.
    */
-  async moveDashboardToEnd(dashboardUrls: readonly string[]): Promise<boolean> {
+  async moveDashboardToEnd(dashboardUrls: readonly string[], windowId?: number, targetTabId?: number): Promise<boolean> {
+    const targetWindowId = windowId ?? await this.#browser.currentWindowId();
     const tabs = await this.#browser.queryAll();
-    const tabId = findDashboardTabNeedingMove(tabs, dashboardUrls);
+    const tabId = findDashboardTabNeedingMove(tabs, dashboardUrls, targetWindowId, targetTabId);
     if (tabId === null) return false;
     await this.#browser.move(tabId, -1);
     return true;

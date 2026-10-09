@@ -8,9 +8,9 @@
  * 2. Record every closed tab into the History list, so the dashboard can
  *    offer to reopen it later. Decision logic lives in
  *    `background/history-recorder.ts`.
- * 3. Keep the dashboard pinned to the rightmost tab of its window, so any
- *    newly opened page lands to its left. Decision logic lives in
- *    `core/position.ts`, behind `TabActions.moveDashboardToEnd`.
+ * 3. With tab sorting enabled, keep the dashboard at the rightmost position.
+ *    Decision logic lives in `core/dashboard.ts`, behind
+ *    `TabActions.moveDashboardToEnd`.
  * 4. When enabled, keep the real Chrome tab groups in step with the domain
  *    cards: a new tab whose domain already has a group joins it, and a
  *    domain that has accumulated 2+ ungrouped tabs gets a group of its own.
@@ -116,12 +116,18 @@ chrome.tabs.onRemoved.addListener((tabId) => {
    "Any newly opened page should land to the left of Tab Out" — enforced by
    keeping the dashboard tab at the highest index in its window every time a
    tab is created anywhere in the browser. Cheap to run unconditionally:
-   `moveDashboardToEnd` is a no-op unless there is a dashboard tab and it has
-   actually been pushed out of last place.
+   Only when tab sorting is enabled. With it off, the new dashboard positions
+   itself at startup and background events never reposition existing tabs.
    ---------------------------------------------------------------- */
 
-const keepDashboardAtEnd = (): void => {
-  void tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id));
+const keepDashboardAtEnd = (tab?: chrome.tabs.Tab): void => {
+  void (async () => {
+    const settings = await settingsStore.load();
+    if (!settings.autoSortTabs) return;
+    await tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id), tab?.windowId);
+  })().catch((err) => {
+    console.error('[tab-out] Failed to position dashboard:', err);
+  });
 };
 
 chrome.tabs.onCreated.addListener(keepDashboardAtEnd);

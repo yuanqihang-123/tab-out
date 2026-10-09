@@ -16,6 +16,49 @@ describe('dashboardUrls', () => {
 });
 
 describe('findDashboardTabNeedingMove', () => {
+  it('moves only the specified new dashboard even when an older one is active', () => {
+    const tabs = [
+      tab(DASHBOARD, { id: 1, index: 0, active: true }),
+      tab(DASHBOARD, { id: 2, index: 1 }),
+      tab('https://a.com/', { id: 3, index: 2 }),
+    ];
+    expect(findDashboardTabNeedingMove(tabs, URLS, 1, 2)).toBe(2);
+    expect(findDashboardTabNeedingMove(tabs, URLS, 1, 3)).toBeNull();
+    expect(findDashboardTabNeedingMove(tabs, URLS, 1, -1)).toBeNull();
+    expect(findDashboardTabNeedingMove(tabs.slice(0, 2), URLS, 1, 2)).toBeNull();
+  });
+
+  it('does not push an older dashboard past the active new dashboard', () => {
+    const tabs = [
+      tab(DASHBOARD, { id: 1, index: 0 }),
+      tab(DASHBOARD, { id: 2, index: 1, active: true }),
+    ];
+    expect(findDashboardTabNeedingMove(tabs, URLS, 1)).toBeNull();
+    tabs[1] = { ...tabs[1]!, index: 0 };
+    tabs[0] = { ...tabs[0]!, index: 1 };
+    expect(findDashboardTabNeedingMove(tabs, URLS, 1)).toBe(2);
+  });
+
+  it('keeps the rightmost dashboard when none is active', () => {
+    const tabs = [
+      tab(DASHBOARD, { id: 1, index: 0 }),
+      tab(DASHBOARD, { id: 2, index: 1 }),
+      tab('https://a.com/', { id: 3, index: 2, active: true }),
+    ];
+    expect(findDashboardTabNeedingMove(tabs, URLS, 1)).toBe(2);
+  });
+
+  it('only moves a dashboard in the window where a tab was created', () => {
+    const tabs = [
+      tab(DASHBOARD, { id: 1, windowId: 1, index: 0, active: true }),
+      tab('https://a.com/', { id: 2, windowId: 1, index: 1 }),
+      tab(DASHBOARD, { id: 3, windowId: 2, index: 0, active: true }),
+      tab('https://b.com/', { id: 4, windowId: 2, index: 1 }),
+    ];
+    expect(findDashboardTabNeedingMove(tabs, URLS, 2)).toBe(3);
+    expect(findDashboardTabNeedingMove(tabs, URLS, 3)).toBeNull();
+  });
+
   it('reports the dashboard when something sits after it', () => {
     const tabs = [
       tab(DASHBOARD, { id: 1, windowId: 1, index: 0 }),

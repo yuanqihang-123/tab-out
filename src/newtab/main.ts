@@ -34,9 +34,10 @@ async function bootstrap(): Promise<void> {
   const settings = await settingsStore.load();
   await tabActions.applyDashboardPolicy(dashboardUrls(chrome.runtime.id), settings);
 
-  // Take up position at the end of the tab bar — any page opened after
-  // this one should land to its left, never to its right.
-  await tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id));
+  // With sorting off, only this newly opened dashboard may move. Existing
+  // dashboards and ordinary tabs keep their relative order.
+  const targetTabId = settings.autoSortTabs ? undefined : await browser.currentTabId();
+  await tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id), undefined, targetTabId);
 
   const dashboard = new Dashboard({ browser, tabActions, savedTabs, settingsStore, historyService });
   const scheduler = new RenderScheduler(() => dashboard.render());

@@ -322,4 +322,29 @@ describe('TabActions dashboard rules', () => {
     expect(await new TabActions(alreadyLast).moveDashboardToEnd(DASHBOARD_URLS)).toBe(false);
     expect(alreadyLast.moved).toEqual([]);
   });
+
+  it('positions dashboards in the requested window, defaulting to the current window', async () => {
+    const browser = createFakeBrowser([
+      tab(DASHBOARD, { id: 1, windowId: 1, index: 0 }),
+      tab('https://a.com/', { id: 2, windowId: 1, index: 1 }),
+      tab(DASHBOARD, { id: 3, windowId: 2, index: 0 }),
+      tab('https://b.com/', { id: 4, windowId: 2, index: 1 }),
+    ], { currentWindowId: 2 });
+    const actions = new TabActions(browser);
+    await actions.moveDashboardToEnd(DASHBOARD_URLS);
+    await actions.moveDashboardToEnd(DASHBOARD_URLS, 1);
+    expect(browser.moved).toEqual([{ tabId: 3, index: -1 }, { tabId: 1, index: -1 }]);
+  });
+
+  it('only repositions the opening dashboard when given its id', async () => {
+    const browser = createFakeBrowser([
+      tab(DASHBOARD, { id: 1, index: 0, active: true }),
+      tab(DASHBOARD, { id: 2, index: 1 }),
+      tab('https://a.com/', { id: 3, index: 2 }),
+    ]);
+    const actions = new TabActions(browser);
+    await actions.moveDashboardToEnd(DASHBOARD_URLS, undefined, 2);
+    await actions.moveDashboardToEnd(DASHBOARD_URLS, undefined, -1);
+    expect(browser.moved).toEqual([{ tabId: 2, index: -1 }]);
+  });
 });

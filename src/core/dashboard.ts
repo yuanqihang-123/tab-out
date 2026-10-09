@@ -25,15 +25,22 @@ export function dashboardUrls(extensionId: string): string[] {
  * Returns the dashboard tab's id if it is open but no longer the last tab in
  * its window, or `null` when there is nothing to do.
  *
- * Chrome keeps the dashboard last on its own in the common case — inserting a
- * tab before the last one pushes that one's index up. The exception is a tab
- * appended *past* it, which is what duplicating the last tab does.
+ * Prefer the active dashboard, otherwise the rightmost one. Picking the first
+ * match would move an older dashboard past a newly opened dashboard.
+ * With a target id, only that dashboard may move; never fall back to another.
  */
 export function findDashboardTabNeedingMove(
   tabs: readonly TabInfo[],
   dashboardUrls: readonly string[],
+  windowId?: number,
+  targetTabId?: number,
 ): number | null {
-  const dashboard = tabs.find((tab) => dashboardUrls.includes(tab.url));
+  const matches = tabs
+    .filter((tab) => (windowId === undefined || tab.windowId === windowId) && dashboardUrls.includes(tab.url))
+    .sort((a, b) => b.index - a.index);
+  const dashboard = targetTabId === undefined
+    ? matches.find((tab) => tab.active) ?? matches[0]
+    : matches.find((tab) => tab.id === targetTabId);
   if (!dashboard) return null;
 
   const sameWindow = tabs
