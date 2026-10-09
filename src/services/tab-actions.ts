@@ -12,7 +12,7 @@ import type { PinnedSite, TabGroup, TabInfo, TabOutSettings } from '../types';
 import { planTabGrouping } from '../core/auto-group';
 import { selectDuplicateTabIds } from '../core/duplicates';
 import { pinnedInsertIndex } from '../core/grouping';
-import { findDashboardTabNeedingMove } from '../core/dashboard';
+import { findDashboardTabNeedingMove, selectOtherDashboardTabIds } from '../core/dashboard';
 import {
   findFocusTarget,
   selectTabIdsByExactUrl,
@@ -182,6 +182,24 @@ export class TabActions {
       return 'created';
     } catch {
       return 'failed';
+    }
+  }
+
+  /** Apply the saved dashboard policy on startup; browser errors must not prevent rendering. */
+  async applyDashboardPolicy(
+    dashboardUrls: readonly string[],
+    settings: Pick<TabOutSettings, 'allowMultipleDashboards'>,
+  ): Promise<number> {
+    if (settings.allowMultipleDashboards) return 0;
+    try {
+      const currentTabId = await this.#browser.currentTabId();
+      if (currentTabId === -1) return 0;
+      const tabs = await this.#browser.queryAll();
+      const ids = selectOtherDashboardTabIds(tabs, dashboardUrls, currentTabId, settings);
+      if (ids.length > 0) await this.#browser.close(ids);
+      return ids.length;
+    } catch {
+      return 0;
     }
   }
 

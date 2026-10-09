@@ -26,6 +26,10 @@ async function bootstrap(): Promise<void> {
 
   installFaviconFallback();
 
+  // Apply the user's choice before rendering, including dashboards in other windows.
+  const settings = await settingsStore.load();
+  await tabActions.applyDashboardPolicy(dashboardUrls(chrome.runtime.id), settings);
+
   // Take up position at the end of the tab bar — any page opened after
   // this one should land to its left, never to its right.
   await tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id));

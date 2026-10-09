@@ -63,7 +63,7 @@ Your Chrome tab bar quietly reorders itself to match the dashboard's grouping, s
 
 ### Multiple dashboard tabs and windows
 
-Open as many Tab Out pages as you like with **Cmd/Ctrl+T** or **Cmd/Ctrl+N**. Existing dashboard tabs and windows stay open when a new one is created.
+Open as many Tab Out pages as you like with **Cmd/Ctrl+T** or **Cmd/Ctrl+N**. Existing dashboard tabs and windows stay open by default. In Settings → **Dashboard tabs and windows**, turn off **Keep multiple Tab Out dashboards open** to close other dashboards whenever a new one opens. This applies across windows; a window containing only a dashboard closes too. Save your choice to apply it to the next dashboard you open.
 
 ### A real settings page
 
@@ -150,6 +150,7 @@ Click the gear icon in the top-right of the dashboard, or right-click the extens
 |---------|------------------|
 | **Pinned sites** | Sites you always want at hand. Shown inside their own domain card — with a tab open it looks like any other tab, without one it's a greyed, click-to-open placeholder. Each pin has a label, and the list order drives card order. Has its own "Enabled" toggle. |
 | **Disposable tabs** | Which tabs are safe to close because reopening them costs nothing, collected into a shared **Disposable** card and counted by "Tidy up". Also has its own "Enabled" toggle, and a "+ Add suggested rules" button. |
+| **Dashboard tabs and windows** | Keep multiple dashboards open (default on), or close all other dashboards when opening a new one. Applies after saving, on the next dashboard opening. |
 | **Tab sorting** | Whether the tab bar is reordered to match the dashboard automatically (on by default) or only via a manual "Sort tabs" banner. |
 | **Keyboard shortcut** | The key combo that opens the Search overlay on the Tab Out page (default Cmd/Ctrl+F). |
 | **Global shortcuts** | Two shortcuts that work anywhere in Chrome, both **off by default**: `Cmd/Ctrl+Shift+O` opens the Tab Out search box over the page you're on, and `Cmd/Ctrl+Shift+T` opens the dashboard even when Tab Out isn't your new tab page. Chrome owns the key combinations, so rebinding them opens Chrome's own shortcut settings. |

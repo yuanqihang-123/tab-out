@@ -98,6 +98,9 @@ export const DEFAULT_AUTO_SORT_TABS = true;
  */
 export const DEFAULT_AUTO_GROUP_ENABLED = false;
 
+/** Preserve Chrome's normal new-tab/new-window behaviour by default. */
+export const DEFAULT_ALLOW_MULTIPLE_DASHBOARDS = true;
+
 /**
  * The default Search-overlay shortcut: Cmd+F on macOS, Ctrl+F elsewhere —
  * whichever key survives per-platform "find on page" muscle memory, since
@@ -115,6 +118,7 @@ export function createDefaultSettings(): TabOutSettings {
     disposableRules: DEFAULT_DISPOSABLE_RULES.map((rule) => ({ ...rule })),
     maxHistoryItems: DEFAULT_MAX_HISTORY_ITEMS,
     autoSortTabs: DEFAULT_AUTO_SORT_TABS,
+    allowMultipleDashboards: DEFAULT_ALLOW_MULTIPLE_DASHBOARDS,
     autoGroupEnabled: DEFAULT_AUTO_GROUP_ENABLED,
     searchShortcut: { ...DEFAULT_SEARCH_SHORTCUT },
   };

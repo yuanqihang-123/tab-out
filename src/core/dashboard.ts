@@ -5,7 +5,7 @@
  * identify them for tab positioning and the global dashboard shortcut.
  */
 
-import type { TabInfo } from '../types';
+import type { TabInfo, TabOutSettings } from '../types';
 
 /**
  * Every URL that means "a Tab Out dashboard".
@@ -58,4 +58,17 @@ export function findDashboardTab(
   const matches = tabs.filter((tab) => dashboardUrls.includes(tab.url));
   if (matches.length === 0) return null;
   return matches.find((tab) => tab.active) ?? matches[0]!;
+}
+
+/** Select other dashboards to close on startup when the user wants just one. */
+export function selectOtherDashboardTabIds(
+  tabs: readonly TabInfo[],
+  urls: readonly string[],
+  currentTabId: number,
+  settings: Pick<TabOutSettings, 'allowMultipleDashboards'>,
+): number[] {
+  if (settings.allowMultipleDashboards || currentTabId === -1) return [];
+  // A page that has already closed must not close the dashboard that replaced it.
+  if (!tabs.some((tab) => tab.id === currentTabId && urls.includes(tab.url))) return [];
+  return tabs.filter((tab) => tab.id !== currentTabId && urls.includes(tab.url)).map((tab) => tab.id);
 }

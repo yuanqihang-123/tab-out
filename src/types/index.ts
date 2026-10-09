@@ -139,6 +139,8 @@ export interface TabOutSettings {
    * with a manual "Sort tabs" button instead.
    */
   autoSortTabs: boolean;
+  /** Keep existing dashboards when opening another tab or window. */
+  allowMultipleDashboards: boolean;
   /**
    * When true, opening 2 or more tabs that would share one domain card
    * (see `core/grouping.ts`) automatically creates a real Chrome tab group

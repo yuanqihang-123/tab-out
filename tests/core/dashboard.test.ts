@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { dashboardUrls, findDashboardTab, findDashboardTabNeedingMove } from '@/core/dashboard';
+import { dashboardUrls, findDashboardTab, findDashboardTabNeedingMove, selectOtherDashboardTabIds } from '@/core/dashboard';
 import { resetTabIds, tab } from '../helpers/factories';
 
 beforeEach(() => resetTabIds());
@@ -60,5 +60,26 @@ describe('findDashboardTab', () => {
   it('falls back to any dashboard when none is active', () => {
     const tabs = [tab('https://a.com/'), tab('chrome://newtab/', { id: 5 })];
     expect(findDashboardTab(tabs, URLS)?.id).toBe(5);
+  });
+});
+
+describe('selectOtherDashboardTabIds', () => {
+  const tabs = [
+    tab(DASHBOARD, { id: 1, windowId: 1 }),
+    tab(DASHBOARD, { id: 2, windowId: 1 }),
+    tab('chrome://newtab/', { id: 3, windowId: 2 }),
+    tab('https://example.com/', { id: 4, windowId: 2 }),
+    tab('chrome-extension://other/index.html', { id: 5, windowId: 2 }),
+  ];
+
+  it.each([
+    [true, []],
+    [false, [1, 3]],
+  ])('with allowMultipleDashboards=%s, closes only the selected dashboards', (allowMultipleDashboards, expected) => {
+    expect(selectOtherDashboardTabIds(tabs, URLS, 2, { allowMultipleDashboards })).toEqual(expected);
+  });
+
+  it.each([-1, 99])('closes nothing when the calling dashboard is unknown (%s)', (currentTabId) => {
+    expect(selectOtherDashboardTabIds(tabs, URLS, currentTabId, { allowMultipleDashboards: false })).toEqual([]);
   });
 });

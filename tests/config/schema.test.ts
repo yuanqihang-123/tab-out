@@ -22,9 +22,22 @@ describe('normalizeSettings', () => {
       maxHistoryItems: 250,
       autoSortTabs: false,
       autoGroupEnabled: true,
+      allowMultipleDashboards: false,
       searchShortcut: { key: 'k', ctrl: true, meta: false, alt: false, shift: true },
     };
     expect(normalizeSettings(input).settings).toEqual(input);
+  });
+
+  it.each([true, false])('preserves the dashboard policy (%s) through JSON export/import', (allowMultipleDashboards) => {
+    const settings = { ...createDefaultSettings(), allowMultipleDashboards };
+    expect(parseSettingsJson(stringifySettings(settings)).settings).toEqual(settings);
+  });
+
+  it('defaults missing or corrupt dashboard policy to keeping multiple dashboards', () => {
+    expect(normalizeSettings({}).settings.allowMultipleDashboards).toBe(true);
+    const { settings, issues } = normalizeSettings({ allowMultipleDashboards: 'no' });
+    expect(settings.allowMultipleDashboards).toBe(true);
+    expect(issues).toContainEqual(expect.objectContaining({ path: 'allowMultipleDashboards' }));
   });
 
   it('falls back to defaults for input that is not an object at all', () => {

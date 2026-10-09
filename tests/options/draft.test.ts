@@ -19,6 +19,7 @@ const blankDraft = {
   disposable: [],
   maxHistoryItems: '100',
   autoSortTabs: true,
+  allowMultipleDashboards: true,
   autoGroupEnabled: false,
   searchShortcut: { key: 'f', ctrl: true, meta: false, alt: false, shift: false },
 };
@@ -31,6 +32,13 @@ describe('splitList', () => {
 });
 
 describe('draft round-trip', () => {
+  it.each([true, false])('retains the dashboard policy through draft editing (%s)', (allowMultipleDashboards) => {
+    const settings = { ...createDefaultSettings(), allowMultipleDashboards };
+    const draft = settingsToDraft(settings);
+    expect(draft.allowMultipleDashboards).toBe(allowMultipleDashboards);
+    expect(draftToSettings(draft).settings.allowMultipleDashboards).toBe(allowMultipleDashboards);
+  });
+
   it('is lossless for the shipped defaults', () => {
     const settings = createDefaultSettings();
     expect(draftToSettings(settingsToDraft(settings)).settings).toEqual(settings);

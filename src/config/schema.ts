@@ -19,6 +19,7 @@ import {
   SETTINGS_VERSION,
   DEFAULT_MAX_HISTORY_ITEMS,
   DEFAULT_AUTO_SORT_TABS,
+  DEFAULT_ALLOW_MULTIPLE_DASHBOARDS,
   DEFAULT_AUTO_GROUP_ENABLED,
   DEFAULT_PINNED_ENABLED,
   DEFAULT_DISPOSABLE_ENABLED,
@@ -251,6 +252,9 @@ export function normalizeSettings(raw: unknown): NormalizeResult {
   const disposableEnabled = normalizeDisposableEnabled(raw['disposableEnabled'], issues);
   const maxHistoryItems = normalizeMaxHistoryItems(raw['maxHistoryItems'], issues);
   const autoSortTabs = normalizeAutoSortTabs(raw['autoSortTabs'], issues);
+  const allowMultipleDashboards = normalizeBoolean(
+    raw['allowMultipleDashboards'], 'allowMultipleDashboards', DEFAULT_ALLOW_MULTIPLE_DASHBOARDS, issues,
+  );
   const autoGroupEnabled = normalizeAutoGroupEnabled(raw['autoGroupEnabled'], issues);
   const searchShortcut = normalizeSearchShortcut(raw['searchShortcut'], issues);
 
@@ -263,6 +267,7 @@ export function normalizeSettings(raw: unknown): NormalizeResult {
       disposableRules,
       maxHistoryItems,
       autoSortTabs,
+      allowMultipleDashboards,
       autoGroupEnabled,
       searchShortcut,
     },

@@ -287,6 +287,26 @@ describe('TabActions.closeTabs', () => {
 });
 
 describe('TabActions dashboard rules', () => {
+  it.each([
+    [true, [1, 2, 3, 4]],
+    [false, [2, 4]],
+  ])('applies allowMultipleDashboards=%s across windows', async (allowMultipleDashboards, expected) => {
+    const browser = createFakeBrowser([
+      tab(DASHBOARD, { id: 1, windowId: 1 }),
+      tab(DASHBOARD, { id: 2, windowId: 2 }),
+      tab('chrome://newtab/', { id: 3, windowId: 3 }),
+      tab('https://example.com/', { id: 4, windowId: 3 }),
+    ], { currentTabId: 2 });
+    await new TabActions(browser).applyDashboardPolicy(DASHBOARD_URLS, { allowMultipleDashboards });
+    expect(browser.tabs.map((t) => t.id)).toEqual(expected);
+  });
+
+  it('renders safely when browser access fails', async () => {
+    const browser = createFakeBrowser([], { currentTabId: 1 });
+    browser.currentTabId = async () => { throw new Error('no tab'); };
+    expect(await new TabActions(browser).applyDashboardPolicy(DASHBOARD_URLS, { allowMultipleDashboards: false })).toBe(0);
+  });
+
   it('moves the dashboard to the end only when it is not already last', async () => {
     const needsMove = createFakeBrowser([
       tab(DASHBOARD, { id: 1, windowId: 1, index: 0 }),

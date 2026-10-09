@@ -1123,7 +1123,9 @@ async function bootstrap(): Promise<void> {
 
   installFaviconFallback();
 
-  // 保留已有仪表盘，同时执行标签栏定位
+  const settings = await settingsStore.load();
+  await tabActions.applyDashboardPolicy(dashboardUrls(chrome.runtime.id), settings);
+  // 执行标签栏定位
   await tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id));
 
   const dashboard = new Dashboard({ browser, tabActions, savedTabs, settingsStore, historyService });
@@ -1141,11 +1143,13 @@ async function bootstrap(): Promise<void> {
 
 ### 11.2 多标签页、多窗口仪表盘
 
-`Cmd/Ctrl+T` 和 `Cmd/Ctrl+N` 遵循 Chrome 的新建行为：每次都保留新建的标签页或窗口，已有仪表盘也继续存在。启动仪表盘不再关闭其他 Tab Out 页面，原来的 `keepOnlyThisDashboard` 和 `selectStaleDashboardTabIds` 已删除。
+`allowMultipleDashboards` 是同步设置，默认 `true`。Settings → Dashboard tabs and windows 中的 "Keep multiple Tab Out dashboards open" 复选框控制 `Cmd/Ctrl+T`、`Cmd/Ctrl+N` 创建仪表盘时是否保留其他仪表盘。保存后从下一次打开仪表盘开始生效，不立即关闭现有页面。
+
+启动时先读取设置，再通过 `TabActions.applyDashboardPolicy` 执行策略。`core/dashboard.ts#selectOtherDashboardTabIds` 是纯决策：开关为 `true` 时不关闭任何页面；为 `false` 时只选择当前页面以外的仪表盘，范围覆盖所有窗口。仅包含仪表盘的窗口会随标签关闭，普通页面保留。无法识别当前页面时不关闭任何页面。
 
 多个仪表盘共享浏览器和存储状态，每个页面通过现有的标签事件、设置事件和历史记录事件刷新。仪表盘 URL 的识别仍统一由 `core/dashboard.ts#dashboardUrls` 提供，用于定位标签和全局仪表盘快捷键。
 
-不恢复旧的 "Close extras" 横幅，也不把多个仪表盘视为需要清理的问题。
+不恢复旧的 "Close extras" 横幅；由用户设置决定是否清理其他仪表盘。
 
 ### 11.3 `RenderScheduler` — 防抖 + 自我静音
 
@@ -1394,7 +1398,7 @@ npm run build
 | **可丢弃规则改成声明式数据** | 函数没法序列化，也就没法做设置页。数据可以存、可以编辑、可以导出 |
 | **设置存 `sync`，稍后阅读存 `local`** | 设置小且值得跨设备同步；清单可能很大，会撞 `sync` 配额 |
 | **校验器永不抛异常** | 这是新标签页。一条坏数据就白屏的话，用户每次开新标签都会崩 |
-| **允许多个仪表盘** | 新建标签页和窗口遵循 Chrome 原生行为，不自动关闭已有仪表盘 |
+| **可配置仪表盘数量** | 默认保留多个，可选择在新开仪表盘时自动关闭其他仪表盘 |
 | **卡片按 index 定位** | 字符串 slug 会冲突（`Work-Jira` 和 `work.jira`），会关错卡片 |
 | **按域名关 vs 按精确 URL 关** | 关 GitHub 卡片该带走所有 GitHub 标签；关 Disposable 不能带走你在读的邮件 |
 | **可丢弃标签不进关闭历史** | 它们本来就是"关了也不心疼"的页面，记下来只会让 History 被刚清掉的杂物塞满。关掉 Disposable 开关就恢复普通记录 |

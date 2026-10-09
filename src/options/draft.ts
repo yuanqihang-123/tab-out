@@ -42,6 +42,8 @@ export interface DraftState {
   maxHistoryItems: string;
   /** "Automatically sort tabs to match the dashboard" — a checkbox, not a row table. */
   autoSortTabs: boolean;
+  /** Whether opening a dashboard keeps other dashboards open. */
+  allowMultipleDashboards: boolean;
   /** "Automatically group 2+ same-domain tabs into a Chrome tab group" — a checkbox, not a row table. */
   autoGroupEnabled: boolean;
   /** The Search overlay's keyboard shortcut — a recorder widget, not a row table. */
@@ -84,6 +86,7 @@ export function settingsToDraft(settings: TabOutSettings): DraftState {
     disposable: settings.disposableRules.map(disposableRuleToRow),
     maxHistoryItems: String(settings.maxHistoryItems),
     autoSortTabs: settings.autoSortTabs,
+    allowMultipleDashboards: settings.allowMultipleDashboards,
     autoGroupEnabled: settings.autoGroupEnabled,
     searchShortcut: { ...settings.searchShortcut },
   };
@@ -113,6 +116,7 @@ export function draftToSettings(draft: DraftState): NormalizeResult {
     disposableRules,
     maxHistoryItems: draft.maxHistoryItems,
     autoSortTabs: draft.autoSortTabs,
+    allowMultipleDashboards: draft.allowMultipleDashboards,
     autoGroupEnabled: draft.autoGroupEnabled,
     searchShortcut: draft.searchShortcut,
   });

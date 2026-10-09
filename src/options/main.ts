@@ -119,6 +119,9 @@ function render(): void {
     autoSortInput.checked = draft.autoSortTabs;
   }
 
+  const multipleDashboardsInput = byId<HTMLInputElement>('allowMultipleDashboards');
+  if (multipleDashboardsInput) multipleDashboardsInput.checked = draft.allowMultipleDashboards;
+
   const autoGroupInput = byId<HTMLInputElement>('autoGroupEnabled');
   if (autoGroupInput && autoGroupInput.checked !== draft.autoGroupEnabled) {
     autoGroupInput.checked = draft.autoGroupEnabled;
@@ -212,6 +215,11 @@ document.addEventListener('input', (event) => {
   // Plain booleans, not row tables.
   if (input.id === 'autoSortTabs') {
     draft = { ...draft, autoSortTabs: input.checked };
+    updateStatus();
+    return;
+  }
+  if (input.id === 'allowMultipleDashboards') {
+    draft = { ...draft, allowMultipleDashboards: input.checked };
     updateStatus();
     return;
   }
