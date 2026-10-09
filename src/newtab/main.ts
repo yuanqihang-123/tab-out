@@ -6,6 +6,8 @@
  * this is the only file that knows about real Chrome APIs.
  */
 
+import { GeminiService } from '../services/gemini';
+import { renderGeminiForm } from '../ui/render/gemini';
 import { SettingsStore } from '../config/store';
 import { dashboardUrls } from '../core/dashboard';
 import { createChromeBrowserTabs } from '../platform/browser';
@@ -25,6 +27,8 @@ async function bootstrap(): Promise<void> {
   const historyService = new TabHistoryService(createChromeStore('local'));
 
   installFaviconFallback();
+  const geminiContainer = document.getElementById('geminiContainer');
+  if (geminiContainer) geminiContainer.innerHTML = renderGeminiForm();
 
   // Apply the user's choice before rendering, including dashboards in other windows.
   const settings = await settingsStore.load();
@@ -37,7 +41,7 @@ async function bootstrap(): Promise<void> {
   const dashboard = new Dashboard({ browser, tabActions, savedTabs, settingsStore, historyService });
   const scheduler = new RenderScheduler(() => dashboard.render());
 
-  attachController(dashboard, scheduler);
+  attachController(dashboard, scheduler, new GeminiService(browser));
 
   // Repaint when tabs change, or when settings are saved in the options page.
   browser.onChanged(() => scheduler.schedule());

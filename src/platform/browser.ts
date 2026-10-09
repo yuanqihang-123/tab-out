@@ -7,10 +7,15 @@
  * stubbing at all.
  */
 
+import type { GeminiDelivery } from '../types/gemini';
+import { openGeminiPrompt } from './gemini-browser';
+
 import type { ChromeGroupInfo, TabInfo } from '../types';
 
 /** Everything Tab Out does to the browser, in one interface. */
 export interface BrowserTabs {
+  /** Opens a fresh Gemini page, fills its editor and attempts to send the prompt. */
+  openGeminiPrompt(prompt: string): Promise<GeminiDelivery>;
   /** All open tabs across all windows. */
   queryAll(): Promise<TabInfo[]>;
   /** Open tabs in the focused window. */
@@ -54,6 +59,8 @@ export function toTabInfo(tab: chrome.tabs.Tab): TabInfo {
 /** The production {@link BrowserTabs}, backed by the real Chrome APIs. */
 export function createChromeBrowserTabs(): BrowserTabs {
   return {
+    openGeminiPrompt,
+
     async queryAll(): Promise<TabInfo[]> {
       const tabs = await chrome.tabs.query({});
       return tabs.map(toTabInfo).filter((tab) => tab.id !== -1);

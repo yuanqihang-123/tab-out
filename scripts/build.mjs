@@ -41,6 +41,7 @@ const STATIC_ASSETS = [
   ['popup/popup.html', 'popup.html'],
   ['styles/dashboard.css', 'styles/dashboard.css'],
   ['styles/search.css', 'styles/search.css'],
+  ['styles/gemini.css', 'styles/gemini.css'],
   ['styles/popup.css', 'styles/popup.css'],
   ['styles/options.css', 'styles/options.css'],
   ['icons', 'icons'],

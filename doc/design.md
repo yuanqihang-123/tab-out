@@ -1544,3 +1544,14 @@ v1 用 1738 行的单文件证明了"**想法是对的**"；v2 用分层架构�
 > 前者是纯函数，测试起来几乎零成本；后者藏在接口后面，测试时可以整个换掉。
 >
 > 这一条规则，同时解决了可测试性、可维护性和可扩展性三个问题。
+
+
+## Ask Gemini: dashboard → new conversation
+
+主页显示 `ui/render/gemini.ts` 的纯表单，独立样式在 `styles/gemini.css`。`newtab/gemini-controller.ts` 只处理输入、提交状态、中文输入法、重复提交与复制；由主 controller 安装和卸载。`newtab/main.ts` 是服务的组合根。
+
+`core/gemini.ts` 负责空值和长度校验。`services/gemini.ts` 把合法问题交给浏览器接口；`platform/gemini-browser.ts` 创建新 Gemini 标签，订阅加载/关闭事件并在超时后清理监听器。仅在 Gemini 新对话地址上注入 `content/gemini.ts`，不会在登录页或旧对话中注入。
+
+注入函数通过参数接收问题，不需要临时存储或 URL 参数。它在有限时间内等待编辑器、以纯文本填入并发送，等待编辑器清空作为交接信号；已有草稿或等待期间发生用户修改时停止。失败保留输入并允许复制。问题仅在用户提交时传给 Google，不附带标签列表、历史或保存内容。需要 `scripting` 和仅针对 `https://gemini.google.com/*` 的访问权限。
+
+自动填入依赖 Gemini 的网页结构，选择器集中在一个文件便于维护；网页改版或登录状态变化时应提供手动发送/复制退路，而不是伪装成成功。

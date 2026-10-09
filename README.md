@@ -4,7 +4,7 @@
 
 Tab Out 2 is a Chrome extension that replaces your new tab page with a dashboard of everything you have open. Tabs are grouped by registrable domain, the ones that are safe to close are swept into a **Disposable** card, every tab you close lands in a searchable **History**, and a settings page lets you pin sites and write your own rules. Close tabs with a satisfying swoosh + confetti.
 
-No server. No account. No external API calls. Just a Chrome extension.
+No Tab Out server or account. Tab management stays in Chrome; submitting Ask Gemini sends your question to the Gemini web app using your existing Google login.
 
 ---
 
@@ -57,6 +57,12 @@ A configurable keyboard shortcut (default **Cmd+F** on macOS, **Ctrl+F** elsewhe
 
 Space-separated words **narrow** the results: `tab doc` first matches everything for "tab", then keeps only those that also match "doc" — the two may hit different fields (one the title, the other the URL). The same rule applies to every search box in Tab Out: the dashboard overlay, the browser-global popup, the History panel and the saved-tabs archive.
 
+### Ask Gemini from your dashboard
+
+Type a question into **Ask Gemini** and press Enter. Tab Out opens a fresh Gemini tab, fills the question and attempts to send it; the answer appears in Gemini. Your dashboard stays open. No API key is needed, but you must be signed into Gemini and have access to it.
+
+If sign-in, page loading or the site's controls prevent sending, your question stays in Tab Out with a **Copy question** button. A question already filled in Gemini can be sent there manually. The extension accesses only `gemini.google.com` for this action and never includes your tab list or history in the question. Questions are passed directly to the page script, not put in URLs or extension storage. Gemini's page structure can change; see `src/content/gemini.ts` for its editor adapter.
+
 ### Auto-sorted tabs — your tab bar follows the dashboard
 
 Your Chrome tab bar quietly reorders itself to match the dashboard's grouping, so the tabs you see on screen are in the same order as the tabs in the bar. On by default; turn it off in Settings and you get a manual **"Sort tabs"** banner instead.
@@ -100,7 +106,7 @@ Upstream was configured by hand-editing a gitignored `config.local.js`. This for
 - **Save for later** — bookmark tabs to a checklist before closing them, with an archive for the ones you've dealt with
 - **Localhost grouping** — port numbers shown next to each tab, so you can tell your projects apart
 - **Expandable groups** — the first 8 tabs of a card, with a clickable "+N more"
-- **100% local** — your data never leaves your machine
+- **Local tab management** — no Tab Out server or analytics; Ask Gemini sends only the question you submit to Google
 
 ---
 

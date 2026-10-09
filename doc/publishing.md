@@ -30,7 +30,7 @@ npm run package        # → release/tab-out-1.0.0.zip
 在控制台点击 **New item** → 上传这个 zip → 填写：
 
 - **Store listing**：名称、简介、详细描述、分类、语言，以及**至少 1 张 1280×800 的截图**（最多 5 张）。首次上传时名称默认取 `manifest.json` 里的 `name`（当前是 `Tab Out 2`），之后可以在控制台改
-- **Privacy**：说明 `tabs` 与 `storage` 权限的用途（在新标签页展示已打开的标签、分组、关闭标签、保存设置）。Tab Out 2 完全本地运行，选择「不收集用户数据」
+- **Privacy**：说明 `tabs` 与 `storage` 权限的用途（在新标签页展示已打开的标签、分组、关闭标签、保存设置）。标签管理在本地运行；Ask Gemini 会把用户主动提交的问题发送给 Google。隐私披露需覆盖该功能，不能继续声称所有数据都不外发
 - **Distribution**：可见性（Public / Unlisted）、地区
 
 每个字段该填什么、直接可粘贴的文案（简介、详细描述、单一用途说明、权限理由、数据使用声明、隐私政策全文）都在 [webstore-listing.md](webstore-listing.md) 里，英文撰写，可逐块复制。

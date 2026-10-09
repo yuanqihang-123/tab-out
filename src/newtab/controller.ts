@@ -7,6 +7,8 @@
  * and one case here.
  */
 
+import type { GeminiService } from '../services/gemini';
+import { attachGeminiForm, type GeminiAction } from './gemini-controller';
 import type { Dashboard } from './dashboard';
 import { analyzeDuplicates } from '../core/duplicates';
 import { moveSelection } from '../core/search';
@@ -20,6 +22,7 @@ import { plural } from '../ui/html';
 
 /** Every interactive `data-action` the dashboard understands. */
 export type DashboardAction =
+  | GeminiAction
   | 'sort-tabs'
   | 'open-pinned-site'
   | 'open-settings'
@@ -138,7 +141,9 @@ function toastOpenResult(
 export function attachController(
   dashboard: Dashboard,
   scheduler: RenderScheduler,
+  gemini: GeminiService,
 ): () => void {
+  const detachGemini = attachGeminiForm(gemini);
   const { tabActions, savedTabs, historyService } = dashboard.deps;
 
   const openHistoryPanel = (): void => {
@@ -554,6 +559,7 @@ export function attachController(
   document.addEventListener('keydown', onKeydown);
 
   return () => {
+    detachGemini();
     document.removeEventListener('click', clickHandler);
     document.removeEventListener('click', onArchiveToggle);
     document.removeEventListener('input', inputHandler);

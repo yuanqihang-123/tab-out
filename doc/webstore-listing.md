@@ -147,7 +147,7 @@ Tab Out 2 replaces Chrome's new tab page with a dashboard for managing the tabs 
 
 ### 6.2 Permissions justification
 
-The manifest requests exactly three permissions; all fields are required.
+The manifest requests four API permissions and host access limited to Gemini; explain each requested permission.
 
 **`tabs` → paste**
 
@@ -168,7 +168,13 @@ Used to persist the user's own data across sessions: their settings (chrome.stor
 ```
 
 If the dashboard ever lists a fourth permission, it is a leftover — remove it from the manifest,
-upload a new version, and try again. The current manifest declares `tabs`, `tabGroups` and `storage`.
+upload a new version, and try again. The current manifest declares `tabs`, `tabGroups`, `storage` and `scripting`, with host access limited to `https://gemini.google.com/*`.
+
+**`scripting` and `https://gemini.google.com/*` → paste**
+
+```
+Used only after the user submits Ask Gemini on the dashboard: opens a fresh Gemini web-app tab, fills the user’s question and attempts to send it. Page access is limited to gemini.google.com. The extension does not read or attach the user's tab list, history, saved tabs or Gemini conversation history. No prompt is placed in URLs or extension storage. If the page is unavailable, the user can copy the question and continue manually.
+```
 
 ### 6.3 Remote code
 
@@ -194,9 +200,12 @@ What Tab Out 2 actually does:
 | Closed-tab history | Written by the extension itself | Yes — `chrome.storage.local` | No |
 | Saved-for-later list | Written by the extension itself | Yes — `chrome.storage.local` | No |
 | Settings | Written by the extension itself | Yes — `chrome.storage.sync` | No |
+| Ask Gemini question | Only when submitted | Not persisted by Tab Out; Google may retain it under the Gemini account | Sent to Google, not the developer |
 | Site domain, for that tab's icon | Yes | No | Sent to Google's favicon service, not to the developer |
 
-**Recommended answers:**
+**Before publishing:** Include Ask Gemini in the current store data-disclosure form. The local-only description below applies to tab management; it must not be used as a blanket description of Gemini question transmission.
+
+**Tab-management disclosure guidance:**
 
 - **Data types collected:** tick nothing in the "collects" group. The extension never sends data to
   the developer; the activity it *handles* is disclosed in the privacy policy (§7) instead, which
@@ -240,12 +249,12 @@ Nowhere. Tab Out 2 has no server, no account and no analytics. We do not receive
 
 NETWORK REQUESTS
 
-The extension makes two kinds of outbound request, both for display assets only:
+The extension loads display assets and can send an explicitly submitted question to Gemini:
 
 1. Site icons. Each tab shows its site's icon, loaded from Google's public favicon service (google.com/s2/favicons). That request includes the site's domain, for example "github.com", so the service can return the matching icon. It does not include the page path, the page title, or your history.
 2. Web fonts. The interface uses two fonts served by Google Fonts (fonts.googleapis.com and fonts.gstatic.com).
 
-Neither request identifies you, and neither is used to build a profile of you.
+3. Ask Gemini. When you submit a question, the extension opens Gemini and fills/sends only that question. Google processes it under your Gemini account and its applicable privacy terms. Tab Out does not attach your tabs, history or saved items, and does not persist the prompt.
 
 YOUR CHOICES
 
@@ -275,8 +284,8 @@ No account, login or setup is needed.
 
 1. Install the extension and open a new tab — the dashboard is the extension's only UI.
 2. Open a handful of tabs (for example github.com, mail.google.com, and two copies of the same page) and return to a new tab. Tabs are grouped by site, and the duplicate shows a "(2x)" badge.
-3. The extension does not collect or transmit user data. It reads open tabs to draw the page, and stores the user's own settings, saved tabs and closed-tab history in Chrome's extension storage. The only outbound requests are site icons from Google's public favicon service, and the interface web fonts from Google Fonts — see the privacy policy.
-4. Permissions: "tabs" is required to read, group, close and reorder tabs; "tabGroups" is required to show/create Chrome tab groups on the dashboard; "storage" persists the user's settings, saved tabs and history.
+3. Tab management runs locally. Ask Gemini sends only a question explicitly submitted by the user to Google; it requires an existing Gemini login. Display assets include site icons and web fonts — see the privacy policy.
+4. Permissions: "tabs" handles tabs; "tabGroups" handles groups; "storage" persists settings, saved tabs and history. "scripting" and Gemini-only host access fill/send the user-submitted question in a fresh Gemini page.
 ```
 
 ## 9. Before you submit — checklist

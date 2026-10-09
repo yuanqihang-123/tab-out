@@ -92,6 +92,11 @@ export function createFakeBrowser(
       return state.addedToGroups;
     },
 
+    async openGeminiPrompt() {
+      state.created.push({ url: 'https://gemini.google.com/app' });
+      return 'sent' as const;
+    },
+
     async queryAll() {
       return [...state.tabs];
     },

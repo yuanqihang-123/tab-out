@@ -25,7 +25,7 @@ You're installing **Tab Out** for the user. Set it up *and* get them excited abo
 > - **Click any tab title to jump to it**, even across Chrome windows
 > - **Save for later** bookmarks individual tabs to a checklist before closing them
 > - **Fully configurable** — a settings page for pinned sites and disposable rules, each switchable off with one checkbox
-> - **100% local** — no server, no accounts, no data sent anywhere
+> - **Local tab management** — no Tab Out server or account; Ask Gemini sends only your submitted question to Google
 >
 > It's a Chrome extension. Setup takes about 2 minutes.
 
@@ -91,7 +91,13 @@ Most people miss this, so mention it explicitly:
 > - **Auto-grouping** — off by default. Turn it on and any 2+ tabs that would share one domain card become a real Chrome tab group, named after that domain; a tab you open later on that same site joins that group rather than starting a second one; and a tab already in a Chrome tab group is never re-grouped or moved.
 > - **Tab sorting** — turn auto-sort off if you'd rather sort manually via a banner.
 > - **History** — how many recently closed tabs to remember (default 100).
-> - **Global shortcuts** — `Cmd+Shift+O` (Mac) works anywhere in Chrome and opens the Tab Out search box over whatever page you're on (press it again to close the box) — this is Chrome's own "activate the extension" shortcut. `Cmd+Shift+T` (Mac) opens the dashboard even if Tab Out isn't your new tab page. Both are already on by default with these keys; to change either one, use the button that opens Chrome's own shortcut settings — there's nothing to toggle on this page, since the key itself is entirely Chrome's to bind.
+> - **Gemini launcher**
+
+- `core/gemini.ts` validates input; `services/gemini.ts` orchestrates through `BrowserTabs.openGeminiPrompt`; `platform/gemini-browser.ts` creates a fresh tab, waits for it and injects `content/gemini.ts`.
+- The injected function must be self-contained: `chrome.scripting.executeScript` serializes the function without module imports. All runtime helpers/selectors must be inside it. No page scripts run just from visiting Gemini; injection follows an explicit Ask Gemini submission.
+- Never place prompt text in a URL or extension storage. Do not overwrite an existing Gemini draft or automatically retry sending. If the user changes the draft while waiting, stop. Preserve the dashboard's original question on failure and offer copying.
+
+**Global shortcuts** — `Cmd+Shift+O` (Mac) works anywhere in Chrome and opens the Tab Out search box over whatever page you're on (press it again to close the box) — this is Chrome's own "activate the extension" shortcut. `Cmd+Shift+T` (Mac) opens the dashboard even if Tab Out isn't your new tab page. Both are already on by default with these keys; to change either one, use the button that opens Chrome's own shortcut settings — there's nothing to toggle on this page, since the key itself is entirely Chrome's to bind.
 >
 > Settings sync across your Chrome profile, and there are Export/Import buttons for backups.
 
@@ -262,7 +268,7 @@ Don't "restore" these — their absence is the design:
 
 ## Key facts
 
-- Pure Chrome extension. No server, no telemetry, no external API calls (favicons come from Google's public favicon service).
+- Pure Chrome extension. No Tab Out server or telemetry. Ask Gemini sends only the submitted question to Google through the Gemini web app; no tab list/history is attached. Favicons come from Google's public favicon service.
 - Manifest V3, permissions: `tabs`, `tabGroups`, `storage`.
 - Zero runtime dependencies — everything shipped in `dist/` is first-party code.
 - `dist/` is what gets loaded into Chrome, and it is gitignored.
