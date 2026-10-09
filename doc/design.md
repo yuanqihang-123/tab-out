@@ -426,7 +426,7 @@ export function isInternalUrl(url): boolean {
 `brave://...` 这类浏览器系统页面**不再**被当成"内部页面"排除——用户是主动打开、
 主动关闭它们的真实标签，理应像任何网页一样被分组、被"关闭全部"、被记录进历史。
 唯一的特例是 `chrome://newtab/`：Chrome 有时就是这样报告被本插件接管的新标签页
-本身，如果把它当普通标签处理，一个尚未被单例逻辑收尾的重复仪表盘就会被分进一张
+本身，如果把它当普通标签处理，一个额外打开的仪表盘就会被分进一张
 "newtab" 卡片里。
 
 ### 6.2 `domain.ts` — 域名变友好名
@@ -1123,9 +1123,7 @@ async function bootstrap(): Promise<void> {
 
   installFaviconFallback();
 
-  // 先执行"单例"规则，再首次渲染 —— 这样渲染出来的数字已经排除了即将关闭的页面
-  await tabActions.keepOnlyThisDashboard(dashboardUrls(chrome.runtime.id));
-  // 然后把自己挪到标签栏最右 —— 之后新开的页面都在它左边
+  // 保留已有仪表盘，同时执行标签栏定位
   await tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id));
 
   const dashboard = new Dashboard({ browser, tabActions, savedTabs, settingsStore, historyService });
@@ -1141,56 +1139,13 @@ async function bootstrap(): Promise<void> {
 
 其他所有模块都通过参数接收依赖，这就是它们能被测试的原因。
 
-### 11.2 单例仪表盘：取代了 "Close extras"
+### 11.2 多标签页、多窗口仪表盘
 
-**v1 的行为**：检测到开了多个 Tab Out 页面时，顶部弹一条横幅："你有 3 个 Tab Out 标签，只保留这一个？" 用户得手动点"Close extras"。
+`Cmd/Ctrl+T` 和 `Cmd/Ctrl+N` 遵循 Chrome 的新建行为：每次都保留新建的标签页或窗口，已有仪表盘也继续存在。启动仪表盘不再关闭其他 Tab Out 页面，原来的 `keepOnlyThisDashboard` 和 `selectStaleDashboardTabIds` 已删除。
 
-**v2 的行为**：直接关掉，不问。
+多个仪表盘共享浏览器和存储状态，每个页面通过现有的标签事件、设置事件和历史记录事件刷新。仪表盘 URL 的识别仍统一由 `core/dashboard.ts#dashboardUrls` 提供，用于定位标签和全局仪表盘快捷键。
 
-```ts
-// Tab Out 是一个"路过的地方"，不是一个"要收藏的标签"。
-async keepOnlyThisDashboard(dashboardUrls: readonly string[]): Promise<number> {
-  try {
-    const keepTabId = await this.#browser.currentTabId();
-    if (keepTabId === -1) return 0;          // 拿不到自己的 id 就什么都不做
-    const tabs = await this.#browser.queryAll();
-    const ids = selectStaleDashboardTabIds(tabs, dashboardUrls, keepTabId);
-    await this.#browser.close(ids);
-    return ids.length;
-  } catch {
-    return 0;   // 出错也不能影响仪表盘渲染
-  }
-}
-```
-
-判定"哪些算 Tab Out 页面"：
-
-```ts
-export function dashboardUrls(extensionId: string): string[] {
-  return [
-    `chrome-extension://${extensionId}/index.html`,
-    `chrome-extension://${extensionId}/index.html#`,
-    'chrome://newtab/',      // Chrome 有时会这样报告被覆盖的新标签页
-  ];
-}
-```
-
-**设计理由**：这条横幅解决的问题（Tab Out 页面堆积）本来就不该让用户操心。能自动做对的事，就不要做成一个需要用户决策的 UI。少一个横幅，少一次打断。
-
-对应的核心函数当然也是纯的、有测试的：
-
-```ts
-export function selectStaleDashboardTabIds(tabs, dashboardUrls, keepTabId): number[] {
-  const set = new Set(dashboardUrls);
-  return tabs.filter(t => t.id !== keepTabId && set.has(t.url)).map(t => t.id);
-}
-```
-
-测试明确保证了**永远不会误关普通页面**：
-
-```ts
-it('never touches ordinary pages', () => { ... });
-```
+不恢复旧的 "Close extras" 横幅，也不把多个仪表盘视为需要清理的问题。
 
 ### 11.3 `RenderScheduler` — 防抖 + 自我静音
 
@@ -1439,7 +1394,7 @@ npm run build
 | **可丢弃规则改成声明式数据** | 函数没法序列化，也就没法做设置页。数据可以存、可以编辑、可以导出 |
 | **设置存 `sync`，稍后阅读存 `local`** | 设置小且值得跨设备同步；清单可能很大，会撞 `sync` 配额 |
 | **校验器永不抛异常** | 这是新标签页。一条坏数据就白屏的话，用户每次开新标签都会崩 |
-| **单例仪表盘取代 "Close extras"** | 能自动做对的事，不要做成需要用户决策的 UI |
+| **允许多个仪表盘** | 新建标签页和窗口遵循 Chrome 原生行为，不自动关闭已有仪表盘 |
 | **卡片按 index 定位** | 字符串 slug 会冲突（`Work-Jira` 和 `work.jira`），会关错卡片 |
 | **按域名关 vs 按精确 URL 关** | 关 GitHub 卡片该带走所有 GitHub 标签；关 Disposable 不能带走你在读的邮件 |
 | **可丢弃标签不进关闭历史** | 它们本来就是"关了也不心疼"的页面，记下来只会让 History 被刚清掉的杂物塞满。关掉 Disposable 开关就恢复普通记录 |

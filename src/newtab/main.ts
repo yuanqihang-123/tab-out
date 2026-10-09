@@ -26,11 +26,7 @@ async function bootstrap(): Promise<void> {
 
   installFaviconFallback();
 
-  // Enforce the single-dashboard rule before the first paint, so the tab
-  // counts we render already exclude the pages we are about to close.
-  await tabActions.keepOnlyThisDashboard(dashboardUrls(chrome.runtime.id));
-
-  // Then take up position at the end of the tab bar — any page opened after
+  // Take up position at the end of the tab bar — any page opened after
   // this one should land to its left, never to its right.
   await tabActions.moveDashboardToEnd(dashboardUrls(chrome.runtime.id));
 

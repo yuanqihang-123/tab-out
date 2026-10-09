@@ -287,38 +287,6 @@ describe('TabActions.closeTabs', () => {
 });
 
 describe('TabActions dashboard rules', () => {
-  it('keeps only this dashboard, never touching ordinary pages', async () => {
-    const browser = createFakeBrowser(
-      [
-        tab(DASHBOARD, { id: 1 }),
-        tab(DASHBOARD, { id: 2 }),
-        tab('chrome://newtab/', { id: 3 }),
-        tab('https://example.com/', { id: 4 }),
-      ],
-      { currentTabId: 2 },
-    );
-
-    expect(await new TabActions(browser).keepOnlyThisDashboard(DASHBOARD_URLS)).toBe(2);
-    expect(browser.tabs.map((t) => t.id)).toEqual([2, 4]);
-  });
-
-  it('closes nothing when the current tab id is unknown, or it is the only one', async () => {
-    const unknown = createFakeBrowser([tab(DASHBOARD, { id: 1 }), tab(DASHBOARD, { id: 2 })], {
-      currentTabId: -1,
-    });
-    expect(await new TabActions(unknown).keepOnlyThisDashboard(DASHBOARD_URLS)).toBe(0);
-    expect(unknown.closed).toEqual([]);
-
-    const only = createFakeBrowser([tab(DASHBOARD, { id: 1 })], { currentTabId: 1 });
-    expect(await new TabActions(only).keepOnlyThisDashboard(DASHBOARD_URLS)).toBe(0);
-  });
-
-  it('swallows browser errors so the dashboard still renders', async () => {
-    const browser = createFakeBrowser([], { currentTabId: 1 });
-    browser.currentTabId = () => Promise.reject(new Error('no tab'));
-    expect(await new TabActions(browser).keepOnlyThisDashboard(DASHBOARD_URLS)).toBe(0);
-  });
-
   it('moves the dashboard to the end only when it is not already last', async () => {
     const needsMove = createFakeBrowser([
       tab(DASHBOARD, { id: 1, windowId: 1, index: 0 }),

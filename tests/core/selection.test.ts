@@ -3,7 +3,6 @@ import {
   desiredTabOrder,
   findFocusTarget,
   planTabSort,
-  selectStaleDashboardTabIds,
   selectTabIdsByExactUrl,
   selectTabIdsByGroupId,
   selectTabIdsByHostname,
@@ -82,25 +81,6 @@ describe('findFocusTarget', () => {
 
   it('returns null when nothing matches', () => {
     expect(findFocusTarget([tab('https://a.com/')], 'https://b.com/', 1)).toBeNull();
-  });
-});
-
-describe('selectStaleDashboardTabIds', () => {
-  const DASHBOARD = 'chrome-extension://abc/index.html';
-
-  it('closes every other dashboard, keeps this one, and never touches real pages', () => {
-    const list = [
-      tab(DASHBOARD, { id: 1 }),
-      tab(DASHBOARD, { id: 2 }),
-      tab('chrome://newtab/', { id: 3 }),
-      tab('https://example.com/', { id: 4 }),
-    ];
-    expect(selectStaleDashboardTabIds(list, [DASHBOARD, 'chrome://newtab/'], 2)).toEqual([1, 3]);
-  });
-
-  it('closes nothing when this is the only dashboard', () => {
-    const list = [tab(DASHBOARD, { id: 1 }), tab('https://example.com/', { id: 2 })];
-    expect(selectStaleDashboardTabIds(list, [DASHBOARD], 1)).toEqual([]);
   });
 });
 

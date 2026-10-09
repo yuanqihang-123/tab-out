@@ -93,25 +93,6 @@ export function findFocusTarget(
 }
 
 /**
- * Picks the stale Tab Out pages to close when a new one opens.
- *
- * Tab Out is a singleton dashboard: opening a new tab should leave exactly one
- * Tab Out page alive — the one you are looking at. Every other copy, in any
- * window, is closed automatically. This replaces the old "Close extras" banner,
- * which asked the user to do by hand what now happens on its own.
- */
-export function selectStaleDashboardTabIds(
-  tabs: readonly TabInfo[],
-  dashboardUrls: readonly string[],
-  keepTabId: number,
-): number[] {
-  const dashboardSet = new Set(dashboardUrls);
-  return tabs
-    .filter((tab) => tab.id !== keepTabId && dashboardSet.has(tab.url))
-    .map((tab) => tab.id);
-}
-
-/**
  * Whether Tab Out may reposition this tab in the tab bar.
  *
  * Two kinds of tab are off limits, and for the same underlying reason — the

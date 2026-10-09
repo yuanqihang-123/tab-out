@@ -61,9 +61,9 @@ Space-separated words **narrow** the results: `tab doc` first matches everything
 
 Your Chrome tab bar quietly reorders itself to match the dashboard's grouping, so the tabs you see on screen are in the same order as the tabs in the bar. On by default; turn it off in Settings and you get a manual **"Sort tabs"** banner instead.
 
-### One dashboard, always on the right
+### Multiple dashboard tabs and windows
 
-Opening a new Tab Out page closes the other ones (upstream showed a "Close extras" banner asking you to do it), and the dashboard keeps itself on the **rightmost** tab, so everything you open next appears to its left.
+Open as many Tab Out pages as you like with **Cmd/Ctrl+T** or **Cmd/Ctrl+N**. Existing dashboard tabs and windows stay open when a new one is created.
 
 ### A real settings page
 
@@ -92,7 +92,7 @@ Upstream was configured by hand-editing a gitignored `config.local.js`. This for
 - ✦ **Search overlay** — search open tabs *and* history from a rebindable shortcut (default Cmd/Ctrl+F)
 - ✦ **Auto-sorted tabs** — the tab bar reorders itself to match the dashboard (or a manual banner, your choice)
 - ✦ **Settings page** — edit every rule without touching code, with per-section switches, Export / Import and Reset
-- ✦ **One dashboard, always** — opening a new Tab Out page closes the others, and it stays on the rightmost tab
+- ✦ **Multiple dashboards** — new tabs and windows stay open, just like in Chrome
 - **See all your tabs at a glance** on a clean grid, grouped by domain — including browser pages like `chrome://extensions` and local `file://` pages, not just websites
 - **Close tabs with style** — swoosh sound + confetti burst, on a whole card or a single tab
 - **Duplicate detection** — an amber `(2x)` badge when you have the same page open twice, with one-click cleanup

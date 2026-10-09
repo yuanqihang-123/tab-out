@@ -1,11 +1,8 @@
 /**
  * core/dashboard.ts — identifying and positioning Tab Out's own tab.
  *
- * Two rules share the question "which open tab is the dashboard?":
- *   - only one dashboard may exist at a time
- *   - the dashboard stays rightmost, so new pages open to its left
- *
- * Both are decided here, purely, and executed by `TabActions`.
+ * Multiple dashboards may coexist across tabs and windows. These helpers
+ * identify them for tab positioning and the global dashboard shortcut.
  */
 
 import type { TabInfo } from '../types';

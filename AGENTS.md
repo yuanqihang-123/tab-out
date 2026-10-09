@@ -75,7 +75,7 @@ Once the extension is loaded:
 > 5. **Duplicate tabs** get an amber "(2x)" badge — "Close duplicates" keeps one copy.
 > 6. **Save a tab for later** with the bookmark icon before closing it; saved tabs appear in the sidebar.
 > 7. **"Tidy up"** appears next to "Close all" whenever something is safe to close in one click — duplicates, disposable tabs, or tabs already on the saved-for-later list.
-> 8. **Only one Tab Out page stays open** — opening a new one auto-closes the others, and it always sits on the rightmost tab.
+> 8. **Open multiple Tab Out pages** — Cmd/Ctrl+T and Cmd/Ctrl+N create new tabs and windows while keeping existing ones open.
 > 9. **History** — the clock icon lists every tab you've recently closed, however you closed it, and reopens one with a click. Disposable tabs (Gmail inbox, a site homepage…) are left out on purpose, since they're safe to lose. It updates live, no refresh needed.
 > 10. **Your tab bar quietly reorders itself** to match the dashboard — on by default; turn it off in Settings for a manual "Sort tabs" banner. It only ever tidies the plain, unpinned tabs: your Chrome tab groups and pinned tabs are left exactly where you put them, and loose tabs are sorted within the gaps between them, never across a group.
 > 11. **Pinned sites live inside their own domain card**: an open pinned tab looks like any other tab, and one with no open tab still shows up there as a grayed-out, click-to-open placeholder chip.
@@ -252,7 +252,7 @@ Saved tabs are never hard-deleted: `completed` moves an item to the archive, `di
 
 Don't "restore" these — their absence is the design:
 
-- **The "Close extras" banner.** Tab Out is a singleton: opening a dashboard auto-closes every other one (`TabActions.keepOnlyThisDashboard`).
+- **The "Close extras" banner and singleton enforcement.** Multiple dashboard tabs and windows are allowed. Opening a dashboard must never automatically close another dashboard.
 - **`config.local.js`.** Personal configuration now lives in the settings page and `chrome.storage`.
 - **The `extension/` directory and `app.js`.** Replaced by `src/` plus a build step; `dist/` is generated and gitignored — never edit it by hand.
 - **The `activeTab` permission.** It was unused; `tabs` covers what's needed.
